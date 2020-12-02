@@ -52,6 +52,27 @@ func SearchPair(data []int) int {
   panic("No mathches for target")
 }
 
+func SearchTriple(data []int) int {
+  for lin1 := 0; lin1 < len(data); lin1 ++ {
+    for lin2 := 0; lin2 < len(data); lin2 ++ {
+      var min, max, oldbin int = 0, len(data) - 1, -1
+
+      for bin := (min+max)/2; oldbin != bin; bin = (min+max)/2 {
+        if data[lin1] + data[lin2] + data[bin] == TARGET {
+          return data[lin1] * data[lin2] * data[bin]
+        } else if data[lin1] + data[lin2] + data[bin] < TARGET {
+          min = bin
+        } else {
+          max = bin
+        }
+
+        oldbin = bin
+      }
+    }
+  }
+  panic("No mathches for target")
+}
+
 func main() {
   defer func() {
     if r := recover(); r != nil {
@@ -62,4 +83,5 @@ func main() {
   data := ReadData()
   sort.Ints(data)
   fmt.Println(SearchPair(data))
+  fmt.Println(SearchTriple(data))
 }
