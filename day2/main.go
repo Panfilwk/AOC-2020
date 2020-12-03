@@ -15,25 +15,31 @@ func check(e error) {
   }
 }
 
-func CheckValidity(entry string) bool {
+func ParseLine(entry string) (int, int, rune, string) {
   vals := strings.Split(entry, " ")
   quant_range, req_string, pass := vals[0], vals[1], vals[2]
 
   quants := strings.Split(quant_range, "-")
-  min, err := strconv.Atoi(quants[0])
+  first, err := strconv.Atoi(quants[0])
   check(err)
-  max, err := strconv.Atoi(quants[1])
+  second, err := strconv.Atoi(quants[1])
   check(err)
 
-  var req_chara rune
+  var req_rune rune
   for _, rune := range req_string {
-    req_chara = rune
+    req_rune = rune
     break
   }
 
+  return first, second, req_rune, pass
+}
+
+func CheckValidity1(entry string) bool {
+  min, max, req_rune, pass := ParseLine(entry)
+
   count := 0
-  for _, chara := range pass {
-    if chara == req_chara {
+  for _, cur_rune := range pass {
+    if cur_rune == req_rune {
       count +=1
     }
     if count > max {
@@ -41,6 +47,16 @@ func CheckValidity(entry string) bool {
     }
   }
   return count >= min
+}
+
+func CheckValidity2(entry string) bool {
+  first, second, req_rune, pass := ParseLine(entry)
+
+  valid := false
+  for i, cur_rune := range pass {
+     valid = valid != ((i == first-1 || i == second-1) && cur_rune == req_rune)
+  }
+  return valid
 }
 
 func main() {
@@ -54,13 +70,17 @@ func main() {
   check(err)
   defer file.Close()
 
-  valid_count := 0
+  valid_count_1, valid_count_2 := 0, 0
   scanner := bufio.NewScanner(file)
   for scanner.Scan() {
-    if CheckValidity(scanner.Text()) {
-      valid_count++
+    if CheckValidity1(scanner.Text()) {
+      valid_count_1++
+    }
+    if CheckValidity2(scanner.Text()) {
+      valid_count_2++
     }
   }
   check(scanner.Err())
-  fmt.Println(valid_count, "passwords are valid!")
+  fmt.Println(valid_count_1, "passwords are valid by the old metric!")
+  fmt.Println(valid_count_2, "passwords are valid!")
 }
