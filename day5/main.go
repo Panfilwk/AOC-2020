@@ -5,19 +5,13 @@ import (
   "log"
   "fmt"
   "os"
+  "sort"
 )
 
 func check(e error) {
   if e != nil {
     panic(e)
   }
-}
-
-func max(x, y int) int {
-  if x >= y {
-    return x
-  }
-  return y
 }
 
 func get_seat_id(pass string) int {
@@ -38,20 +32,20 @@ func get_seat_id(pass string) int {
   return max_row * 8 + max_col
 }
 
-func get_max_seat_id() int {
+func get_seat_ids() []int {
   file, err := os.Open("input.txt")
   check(err)
   defer file.Close()
 
-  max_seat_id := -1
+  var seats []int
 
   scanner := bufio.NewScanner(file)
   for scanner.Scan() {
-    max_seat_id = max(max_seat_id, get_seat_id(scanner.Text()))
+    seats = append(seats, get_seat_id(scanner.Text()))
   }
   check(scanner.Err())
 
-  return max_seat_id
+  return seats
 }
 
 func main() {
@@ -61,5 +55,19 @@ func main() {
     }
   }()
 
-  fmt.Println(get_max_seat_id())
+  seat_ids := get_seat_ids()
+  sort.Ints(seat_ids)
+
+  fmt.Println("Max seat ID is", seat_ids[len(seat_ids) - 1])
+
+  first_id := -1
+  for idx, seat_id := range seat_ids {
+    if first_id == -1 {
+      first_id = seat_id
+    }
+    if seat_id != first_id + idx {
+      fmt.Println("Your seat ID is", first_id + idx)
+      break
+    }
+  }
 }
